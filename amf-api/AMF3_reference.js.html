@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: AMF3/reference.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: AMF3/reference.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>/** @module AMF3/Reference */
+export default class Reference {
+  /**
+   * Initialize the array to hold referenced 'seen' strings
+   * @private
+   * @type {string[]}
+   */
+  #strings;
+  /**
+   * Initialize the array to hold referenced 'seen' objects
+   * @private
+   * @type {object[]}
+   */
+  #objects;
+  /**
+   * Initialize the array to hold referenced 'seen' traits. These values are hashed to improve performance
+   * @private
+   * @type {string[]}
+   */
+  #traits;
+
+  /**
+   * Creates a new AMF3 Reference holder
+   */
+  constructor() {
+    this.#strings = [];
+    this.#objects = [];
+    this.#traits = [];
+    this.reset = this.reset.bind(this); // Bind so 'serializePacket' and 'deserializePacket' can pass from within AMF entrypoint
+  }
+
+  /**
+   * Returns the referenced 'seen' strings
+   * @returns {string[]}
+   */
+  get strings() { return this.#strings; }
+  /**
+   * Returns the referenced 'seen' objects
+   * @returns {object[]}
+   */
+  get objects() { return this.#objects; }
+  /**
+   * Returns the referenced 'seen' traits
+   * @returns {string[]}
+   */
+  get traits() { return this.#traits; }
+
+  /**
+   * Resets the references
+   */
+  reset() {
+    this.#strings = [];
+    this.#objects = [];
+    this.#traits = [];
+  }
+
+  /**
+   * Retrieves a referenced value by its index
+   * @param {number} index - The index in the referenced type's array table to look up
+   * @param {'strings'|'objects'|'traits'} table - The reference table type
+   * @returns {object|string} The referenced value
+   */
+  get(index, table) {
+    const value = this[table][index];
+
+    return (table === 'traits') ? JSON.parse(value) : value;
+  }
+
+  /**
+   * Sets an object to hold as a reference
+   * @param {object|string} value - The value to reference and mark as 'seen'
+   * @param {'strings'|'objects'|'traits'} table - The reference table type
+   */
+  set(value, table) {
+    this[table][this[table].length] = value;
+  }
+
+  /**
+   * Checks whether the given object is referenced (or, 'seen'). If not, then it's added. For every call, a 'cache' object is returned
+   * @param {object} - The object to check if it's referenced or not
+   * @param {'strings'|'objects'|'traits'} table - The reference table type
+   * @returns {{index: number, referenced: boolean}} The cache object; its index and if it's referenced or not
+   */
+  has(value, table) {
+    const index = this[table].indexOf(value);
+    const cache = { index, referenced: (index !== -1) };
+
+    if (!cache.referenced) this.set(value, table);
+
+    return cache;
+  }
+}</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Modules</h3><ul><li><a href="module-AMF_ClassAlias.html">AMF/ClassAlias</a></li><li><a href="module-AMF_Remoting_Header.html">AMF/Remoting/Header</a></li><li><a href="module-AMF_Remoting_Message.html">AMF/Remoting/Message</a></li><li><a href="module-AMF_Remoting_Packet.html">AMF/Remoting/Packet</a></li><li><a href="module-AMF_Utils.html">AMF/Utils</a></li><li><a href="module-AMF0_Deserializer.html">AMF0/Deserializer</a></li><li><a href="module-AMF0_Reference.html">AMF0/Reference</a></li><li><a href="module-AMF0_Serializer.html">AMF0/Serializer</a></li><li><a href="module-AMF3_Deserializer.html">AMF3/Deserializer</a></li><li><a href="module-AMF3_Reference.html">AMF3/Reference</a></li><li><a href="module-AMF3_Serializer.html">AMF3/Serializer</a></li></ul><h3>Classes</h3><ul><li><a href="AMF.html">AMF</a></li><li><a href="module-AMF_ClassAlias.html">AMF/ClassAlias</a></li><li><a href="module-AMF_Remoting_Header.html">AMF/Remoting/Header</a></li><li><a href="module-AMF_Remoting_Message.html">AMF/Remoting/Message</a></li><li><a href="module-AMF_Remoting_Packet.html">AMF/Remoting/Packet</a></li><li><a href="module-AMF0_Deserializer.html">AMF0/Deserializer</a></li><li><a href="module-AMF0_Reference.html">AMF0/Reference</a></li><li><a href="module-AMF0_Serializer.html">AMF0/Serializer</a></li><li><a href="module-AMF3_Deserializer.html">AMF3/Deserializer</a></li><li><a href="module-AMF3_Reference.html">AMF3/Reference</a></li><li><a href="module-AMF3_Serializer.html">AMF3/Serializer</a></li></ul><h3>Global</h3><ul><li><a href="global.html#Markers">Markers</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 4.0.5</a> on Mon May 25 2026 14:47:57 GMT+0200 (Midden-Europese zomertijd)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>

@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: AMF.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: AMF.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>import ClassAlias from './AMF/alias.js';
+
+import { default as Serializer0 } from './AMF0/serializer.js';
+import { default as Serializer3 } from './AMF3/serializer.js';
+
+import { default as Deserializer0 } from './AMF0/deserializer.js';
+import { default as Deserializer3 } from './AMF3/deserializer.js';
+
+/**
+ * @typedef {import('./AMF/remoting/packet.js').default} Packet
+ */
+
+/**
+ * @author SeirDotExe
+ * @license BSD-3-Clause
+ */
+export class AMF {
+  /**
+   * Initialize the class alias holder
+   * @static
+   * @type {ClassAlias}
+   */
+  static classAlias = new ClassAlias();
+
+  /**
+   * Initialize the serializers
+   * @static
+   * @type {{ 0: Serializer0, 3: Serializer3}}
+   */
+  static #serializers = {
+    0: new Serializer0(this.classAlias, AMF.serialize.bind(AMF)),
+    3: new Serializer3(this.classAlias)
+  };
+
+  /**
+   * Initialize the deserializers
+   * @static
+   * @type {{ 0: Deserializer0, 3: Deserializer3}}
+   */
+  static #deserializers = {
+    0: new Deserializer0(this.classAlias, AMF.deserialize.bind(AMF)),
+    3: new Deserializer3(this.classAlias)
+  };
+
+  /**
+   * Registers a Dynamic Property Writer to dynamically modify an object before it's serialized
+   * @param {Function} method - The Dynamic Property Writer method
+   * @param {0|3} [version=3] - The AMF version
+   * @throws {ReferenceError} There must be 1 argument in the given method
+   */
+  static registerDynamicPropertyWriter(method, version = 3) {
+    if (method.length !== 1) {
+      throw new ReferenceError('A Dynamic Property Writer can only take 1 argument, which is used to pass objects for modification.');
+    }
+
+    this.#serializers[version].dynamicPropertyWriter = method;
+  }
+
+  /**
+   * Serializes an object into AMF binary data
+   * @static
+   * @param {any} value - Any supported value to serialize
+   * @param {0|3} [version=3] - The AMF version
+   * @returns {Buffer} Returns the AMF data in a buffer
+   */
+  static serialize(value, version = 3) {
+    return this.#serializers[version].serialize(value).flush();
+  }
+
+  /**
+   * Deserializes AMF binary data to an object
+   * @static
+   * @param {Buffer} buffer - The AMF binary data
+   * @param {0|3} [version=3] - The AMF version
+   * @returns {any} The deserialized object
+   */
+  static deserialize(buffer, version = 3) {
+    return this.#deserializers[version].deserialize(buffer);
+  }
+
+  /**
+   * Serializes a packet into AMF binary data
+   * @static
+   * @param {Packet} packet - The AMF packet to serialize
+   * @returns {Buffer} Returns the AMF packet data in a buffer
+   */
+  static serializePacket(packet) {
+    return this.#serializers[0].serializePacket(packet, this.#serializers[3].reset).flush();
+  }
+
+  /**
+   * Deserializes AMF binary data to a packet
+   * @static
+   * @param {Buffer} buffer - The AMF binary data
+   * @returns {Packet} The deserialized packet
+   */
+  static deserializePacket(buffer) {
+    return this.#deserializers[0].deserializePacket(buffer, this.#deserializers[3].reset, this.#deserializers[3].bytesAvailable.bind(this.#deserializers[3]));
+  }
+}</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Modules</h3><ul><li><a href="module-AMF_ClassAlias.html">AMF/ClassAlias</a></li><li><a href="module-AMF_Remoting_Header.html">AMF/Remoting/Header</a></li><li><a href="module-AMF_Remoting_Message.html">AMF/Remoting/Message</a></li><li><a href="module-AMF_Remoting_Packet.html">AMF/Remoting/Packet</a></li><li><a href="module-AMF_Utils.html">AMF/Utils</a></li><li><a href="module-AMF0_Deserializer.html">AMF0/Deserializer</a></li><li><a href="module-AMF0_Reference.html">AMF0/Reference</a></li><li><a href="module-AMF0_Serializer.html">AMF0/Serializer</a></li><li><a href="module-AMF3_Deserializer.html">AMF3/Deserializer</a></li><li><a href="module-AMF3_Reference.html">AMF3/Reference</a></li><li><a href="module-AMF3_Serializer.html">AMF3/Serializer</a></li></ul><h3>Classes</h3><ul><li><a href="AMF.html">AMF</a></li><li><a href="module-AMF_ClassAlias.html">AMF/ClassAlias</a></li><li><a href="module-AMF_Remoting_Header.html">AMF/Remoting/Header</a></li><li><a href="module-AMF_Remoting_Message.html">AMF/Remoting/Message</a></li><li><a href="module-AMF_Remoting_Packet.html">AMF/Remoting/Packet</a></li><li><a href="module-AMF0_Deserializer.html">AMF0/Deserializer</a></li><li><a href="module-AMF0_Reference.html">AMF0/Reference</a></li><li><a href="module-AMF0_Serializer.html">AMF0/Serializer</a></li><li><a href="module-AMF3_Deserializer.html">AMF3/Deserializer</a></li><li><a href="module-AMF3_Reference.html">AMF3/Reference</a></li><li><a href="module-AMF3_Serializer.html">AMF3/Serializer</a></li></ul><h3>Global</h3><ul><li><a href="global.html#Markers">Markers</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 4.0.5</a> on Mon May 25 2026 14:47:57 GMT+0200 (Midden-Europese zomertijd)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>
